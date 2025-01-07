@@ -18,7 +18,7 @@ import {
   ParticipantTile,
   RoomAudioRenderer,
 } from '../components';
-import { useCreateLayoutContext } from '../context';
+import { useCreateLayoutContext, useRoomContext } from '../context';
 import { usePinnedTracks, useTracks } from '../hooks';
 import { Chat } from './Chat';
 import { ControlBar } from './ControlBar';
@@ -67,6 +67,13 @@ export function VideoConference({
   });
   const lastAutoFocusedScreenShareTrack = React.useRef<TrackReferenceOrPlaceholder | null>(null);
 
+  // Modified by Sai Sreekar
+  // Get room context
+  // Access the current room's context to retrieve information about the local participant.
+  // This includes permissions, identity, and other participant-related data.
+  const room = useRoomContext();
+  const localParticipant = room?.localParticipant;
+
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
@@ -87,7 +94,27 @@ export function VideoConference({
     .filter((track) => track.publication.source === Track.Source.ScreenShare);
 
   const focusTrack = usePinnedTracks(layoutContext)?.[0];
-  const carouselTracks = tracks.filter((track) => !isEqualTrackRef(track, focusTrack));
+
+  //Modified by Sai Sreekar
+  // Check local participant permissions
+  // Determine if the local participant has publishing permissions.
+  // This is crucial for deciding whether to include the participant's self-view in the grid.
+  const canPublish = localParticipant?.permissions?.canPublish;
+
+  // Filter tracks to hide self-view for non-publishing participants
+  const filteredTracks = tracks.filter((track) => {
+    if (!canPublish) {
+      // For participants without publishing permissions, exclude their own video track from the grid.
+      return track.participant.identity !== localParticipant?.identity;
+    }
+    // Include all tracks for participants with publishing permissions.
+    return true;
+  });
+
+  // Modified by Sai Sreekar
+  // Filter carousel tracks to exclude the currently focused track
+  // Carousel tracks are shown alongside the focus view, and the focused track is excluded from the carousel.
+  const carouselTracks = filteredTracks.filter((track) => !isEqualTrackRef(track, focusTrack));
 
   React.useEffect(() => {
     // If screen share tracks are published, and no pin is set explicitly, auto set the screen share.
@@ -141,7 +168,12 @@ export function VideoConference({
           <div className="lk-video-conference-inner">
             {!focusTrack ? (
               <div className="lk-grid-layout-wrapper">
-                <GridLayout tracks={tracks}>
+                {/*
+                  Modified by Sai Sreekar
+                  Render the grid layout with the filtered tracks
+                  The grid dynamically displays only the tracks allowed by the filtering logic.
+                */}
+                <GridLayout tracks={filteredTracks}>
                   <ParticipantTile />
                 </GridLayout>
               </div>

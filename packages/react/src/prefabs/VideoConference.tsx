@@ -96,18 +96,11 @@ export function VideoConference({
   const focusTrack = usePinnedTracks(layoutContext)?.[0];
 
   //Modified by Sai Sreekar
-  // Check local participant permissions
-  // Determine if the local participant has publishing permissions.
-  // This is crucial for deciding whether to include the participant's self-view in the grid.
-  const canPublish = localParticipant?.permissions?.canPublish;
-
-  // Filter tracks to hide self-view for non-publishing participants
+  // display tracks only which are subscribed
   const filteredTracks = tracks.filter((track) => {
-    if (!canPublish) {
-      // For participants without publishing permissions, exclude their own video track from the grid.
-      return track.participant.identity !== localParticipant?.identity;
+    if (!track.publication?.isSubscribed) {
+      return false;
     }
-    // Include all tracks for participants with publishing permissions.
     return true;
   });
 

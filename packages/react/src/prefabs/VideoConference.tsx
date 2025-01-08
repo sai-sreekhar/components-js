@@ -18,7 +18,7 @@ import {
   ParticipantTile,
   RoomAudioRenderer,
 } from '../components';
-import { useCreateLayoutContext, useRoomContext } from '../context';
+import { useCreateLayoutContext } from '../context';
 import { usePinnedTracks, useTracks } from '../hooks';
 import { Chat } from './Chat';
 import { ControlBar } from './ControlBar';
@@ -66,13 +66,6 @@ export function VideoConference({
     showSettings: false,
   });
   const lastAutoFocusedScreenShareTrack = React.useRef<TrackReferenceOrPlaceholder | null>(null);
-
-  // Modified by Sai Sreekar
-  // Get room context
-  // Access the current room's context to retrieve information about the local participant.
-  // This includes permissions, identity, and other participant-related data.
-  const room = useRoomContext();
-  const localParticipant = room?.localParticipant;
 
   const tracks = useTracks(
     [

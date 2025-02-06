@@ -31,6 +31,9 @@ export interface VideoConferenceProps extends React.HTMLAttributes<HTMLDivElemen
   chatMessageFormatter?: MessageFormatter;
   chatMessageEncoder?: MessageEncoder;
   chatMessageDecoder?: MessageDecoder;
+  // Modified by Sai Sreekar
+  // Added a new prop `hideSelfView` to allow the user to optionally hide their own video feed in the conference.
+  hideSelfView?: boolean; // New prop to hide self-view
   /** @alpha */
   SettingsComponent?: React.ComponentType;
 }
@@ -58,6 +61,9 @@ export function VideoConference({
   chatMessageDecoder,
   chatMessageEncoder,
   SettingsComponent,
+  // Modified by Sai Sreekar
+  // Set a default value of `false` for `hideSelfView` to ensure the self-view is shown unless explicitly disabled.
+  hideSelfView = false,
   ...props
 }: VideoConferenceProps) {
   const [widgetState, setWidgetState] = React.useState<WidgetState>({
@@ -87,20 +93,29 @@ export function VideoConference({
     .filter((track) => track.publication.source === Track.Source.ScreenShare);
 
   const focusTrack = usePinnedTracks(layoutContext)?.[0];
-
-  //Modified by Sai Sreekar
-  // display tracks only which are subscribed
-  const filteredTracks = tracks.filter((track) => {
-    if (!track.publication?.isSubscribed) {
-      return false;
-    }
-    return true;
-  });
+  const carouselTracks = tracks.filter((track) => !isEqualTrackRef(track, focusTrack));
 
   // Modified by Sai Sreekar
-  // Filter carousel tracks to exclude the currently focused track
-  // Carousel tracks are shown alongside the focus view, and the focused track is excluded from the carousel.
-  const carouselTracks = filteredTracks.filter((track) => !isEqualTrackRef(track, focusTrack));
+  if (hideSelfView) {
+    // Find the index of the local participant's track in `tracks` array.
+    // This helps in identifying and removing the user's own video feed if `hideSelfView` is true.
+    const selfTrackIndex = tracks.findIndex((track) => track.participant.isLocal);
+
+    // If the local participant's track is found in `tracks`, remove it from the list.
+    // This prevents the user's own video from being displayed in the grid or focused layout.
+    if (selfTrackIndex !== -1) {
+      tracks.splice(selfTrackIndex, 1);
+    }
+
+    // Find the index of the local participant's track in `carouselTracks` to ensure self-view is hidden from the carousel layout as well.
+    const selfTrackIndexInCarousel = carouselTracks.findIndex((track) => track.participant.isLocal);
+
+    // If the local participant's track is found in `carouselTracks`, remove it.
+    // This ensures that the self-view does not appear in the carousel layout.
+    if (selfTrackIndexInCarousel !== -1) {
+      carouselTracks.splice(selfTrackIndexInCarousel, 1);
+    }
+  }
 
   React.useEffect(() => {
     // If screen share tracks are published, and no pin is set explicitly, auto set the screen share.
@@ -154,12 +169,7 @@ export function VideoConference({
           <div className="lk-video-conference-inner">
             {!focusTrack ? (
               <div className="lk-grid-layout-wrapper">
-                {/*
-                  Modified by Sai Sreekar
-                  Render the grid layout with the filtered tracks
-                  The grid dynamically displays only the tracks allowed by the filtering logic.
-                */}
-                <GridLayout tracks={filteredTracks}>
+                <GridLayout tracks={tracks}>
                   <ParticipantTile />
                 </GridLayout>
               </div>

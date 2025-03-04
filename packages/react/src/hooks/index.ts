@@ -54,3 +54,6 @@ export * from './useTrackTranscription';
 export * from './useVoiceAssistant';
 export * from './useParticipantAttributes';
 export * from './useIsRecording';
+export { useMediaQuery } from './internal'; // Added this line by akash
+export { useWarnAboutMissingStyles } from './useWarnAboutMissingStyles'; // Added this line by akash
+export { useObservableState } from './internal/useObservableState'; // Added this line by akash

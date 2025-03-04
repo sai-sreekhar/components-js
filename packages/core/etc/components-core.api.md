@@ -115,7 +115,7 @@ export function createChatObserver(room: Room): Observable<[message: ChatMessage
 export function createConnectionQualityObserver(participant: Participant): Observable<ConnectionQuality>;
 
 // @public (undocumented)
-export function createDataObserver(room: Room): Observable<[payload: Uint8Array, participant?: RemoteParticipant | undefined, kind?: DataPacket_Kind | undefined, topic?: string | undefined]>;
+export function createDataObserver(room: Room): Observable<[payload: Uint8Array<ArrayBufferLike>, participant?: RemoteParticipant | undefined, kind?: DataPacket_Kind | undefined, topic?: string | undefined]>;
 
 // @public (undocumented)
 export const createDefaultGrammar: () => {
@@ -537,7 +537,7 @@ export function setupConnectionQualityIndicator(participant: Participant): {
 // @public (undocumented)
 export function setupDataMessageHandler<T extends string>(room: Room, topic?: T | [T, ...T[]], onMessage?: (msg: ReceivedDataMessage<T>) => void): {
     messageObservable: Observable<{
-        payload: Uint8Array;
+        payload: Uint8Array<ArrayBufferLike>;
         topic: T;
         from: RemoteParticipant | undefined;
     }>;
@@ -546,9 +546,9 @@ export function setupDataMessageHandler<T extends string>(room: Room, topic?: T 
 };
 
 // @public (undocumented)
-export function setupDeviceSelector(kind: MediaDeviceKind, room?: Room, localTrack?: LocalAudioTrack | LocalVideoTrack): {
+export function setupDeviceSelector(kind: MediaDeviceKind, room: Room, localTrack?: LocalAudioTrack | LocalVideoTrack): {
     className: string;
-    activeDeviceObservable: Observable<string | undefined>;
+    activeDeviceObservable: Observable<string>;
     setActiveMediaDevice: (id: string, options?: SetMediaDeviceOptions) => Promise<void>;
 };
 

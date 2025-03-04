@@ -1,5 +1,26 @@
 # @livekit/components-docs-gen
 
+## 0.0.74
+
+### Patch Changes
+
+- Updated dependencies [[`9b7296a7fd7e210512cce1f8e93101d978bb0c0d`](https://github.com/livekit/components-js/commit/9b7296a7fd7e210512cce1f8e93101d978bb0c0d)]:
+  - @livekit/components-react@2.8.1
+
+## 0.0.73
+
+### Patch Changes
+
+- Updated dependencies [[`979cbc66823f719e3d125aa915b22904214e6855`](https://github.com/livekit/components-js/commit/979cbc66823f719e3d125aa915b22904214e6855)]:
+  - @livekit/components-react@2.8.0
+
+## 0.0.72
+
+### Patch Changes
+
+- Updated dependencies [[`31a2b04ec36e9a3524804a2dbb7c2b663ea18b83`](https://github.com/livekit/components-js/commit/31a2b04ec36e9a3524804a2dbb7c2b663ea18b83)]:
+  - @livekit/components-react@2.7.0
+
 ## 0.0.71
 
 ### Patch Changes
